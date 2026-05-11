@@ -31,6 +31,7 @@ RUN npm run build
 
 # Puerto Render
 EXPOSE 10000
-
+RUN mkdir -p database
+RUN touch database/database.sqlite
 # Ejecutar Laravel
 CMD php artisan serve --host=0.0.0.0 --port=10000
