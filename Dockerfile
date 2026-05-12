@@ -40,13 +40,19 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # =========================
-# INSTALAR FRONTEND
+# FRONTEND / VITE
 # =========================
 RUN npm install
+
+ENV NODE_ENV=production
+
 RUN npm run build
 
+# Verificar build generado
+RUN ls -la public/build
+
 # =========================
-# CREAR SQLITE
+# SQLITE
 # =========================
 RUN mkdir -p database
 RUN touch database/database.sqlite
