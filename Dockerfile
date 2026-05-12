@@ -49,7 +49,6 @@ ENV NODE_ENV=production
 RUN npm run build
 
 # Verificar build generado
-RUN ls -la public/build
 
 # =========================
 # SQLITE
@@ -87,7 +86,6 @@ RUN php artisan migrate --force
 # =========================
 # OPTIMIZAR LARAVEL
 # =========================
-RUN php artisan optimize
 
 # =========================
 # PUERTO RENDER
