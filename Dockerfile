@@ -36,5 +36,9 @@ RUN touch database/database.sqlite
 
 RUN php artisan migrate --force
 
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan view:clear
+
 # Ejecutar Laravel
 CMD php artisan serve --host=0.0.0.0 --port=10000
