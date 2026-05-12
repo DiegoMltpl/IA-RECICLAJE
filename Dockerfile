@@ -1,8 +1,6 @@
-FROM php:8.3-cli
+FROM php:8.3-apache
 
-# =========================
-# INSTALAR DEPENDENCIAS
-# =========================
+# Dependencias
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -14,85 +12,53 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     zip
 
-# =========================
-# EXTENSIONES PHP
-# =========================
+# PHP Extensions
 RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
 
-# =========================
-# INSTALAR COMPOSER
-# =========================
+# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# =========================
-# CARPETA PROYECTO
-# =========================
-WORKDIR /app
+# Apache rewrite
+RUN a2enmod rewrite
 
-# =========================
-# COPIAR ARCHIVOS
-# =========================
+# Carpeta app
+WORKDIR /var/www/html
+
+# Copiar proyecto
 COPY . .
 
-# =========================
-# INSTALAR LARAVEL
-# =========================
+# Config Apache
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+/etc/apache2/sites-available/*.conf
+
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
+/etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# =========================
-# FRONTEND / VITE
-# =========================
+# Frontend
 RUN npm install
-
-ENV NODE_ENV=production
-
 RUN npm run build
 
-# Verificar build generado
-
-# =========================
-# SQLITE
-# =========================
+# SQLite
 RUN mkdir -p database
 RUN touch database/database.sqlite
 
-# =========================
-# PERMISOS
-# =========================
+# Permisos
 RUN chmod -R 777 storage bootstrap/cache database
 
-# =========================
-# VARIABLES PRODUCCIÓN
-# =========================
+# Variables
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# =========================
-# LIMPIAR CONFIG
-# =========================
+# Laravel
 RUN php artisan config:clear
 RUN php artisan view:clear
-
-# =========================
-# STORAGE LINK
-# =========================
 RUN php artisan storage:link
-
-# =========================
-# MIGRACIONES
-# =========================
 RUN php artisan migrate --force
 
-# =========================
-# OPTIMIZAR LARAVEL
-# =========================
-
-# =========================
-# PUERTO RENDER
-# =========================
-EXPOSE 10000
-
-# =========================
-# EJECUTAR LARAVEL
-# =========================
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# Puerto
+EXPOSE 80
