@@ -33,5 +33,8 @@ RUN npm run build
 EXPOSE 10000
 RUN mkdir -p database
 RUN touch database/database.sqlite
+
+RUN php artisan migrate --force
+
 # Ejecutar Laravel
 CMD php artisan serve --host=0.0.0.0 --port=10000
