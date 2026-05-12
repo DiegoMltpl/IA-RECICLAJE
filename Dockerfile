@@ -1,6 +1,8 @@
 FROM php:8.3-cli
 
-# Instalar dependencias
+# =========================
+# INSTALAR DEPENDENCIAS
+# =========================
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -12,50 +14,81 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     zip
 
-# Extensiones PHP
+# =========================
+# EXTENSIONES PHP
+# =========================
 RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
 
-# Instalar Composer
+# =========================
+# INSTALAR COMPOSER
+# =========================
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Carpeta proyecto
+# =========================
+# CARPETA PROYECTO
+# =========================
 WORKDIR /app
 
-# Copiar archivos
+# =========================
+# COPIAR ARCHIVOS
+# =========================
 COPY . .
 
-# Instalar Laravel
+# =========================
+# INSTALAR LARAVEL
+# =========================
 RUN composer install --no-dev --optimize-autoloader
 
-# Instalar frontend
+# =========================
+# INSTALAR FRONTEND
+# =========================
 RUN npm install
 RUN npm run build
 
-# Crear SQLite
+# =========================
+# CREAR SQLITE
+# =========================
 RUN mkdir -p database
 RUN touch database/database.sqlite
 
-# Permisos Laravel
+# =========================
+# PERMISOS
+# =========================
 RUN chmod -R 777 storage bootstrap/cache database
 
-# Variables producción
+# =========================
+# VARIABLES PRODUCCIÓN
+# =========================
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Limpiar cache
+# =========================
+# LIMPIAR CONFIG
+# =========================
 RUN php artisan config:clear
-RUN php artisan cache:clear
 RUN php artisan view:clear
-RUN php artisan route:clear
 
-# Migraciones
+# =========================
+# STORAGE LINK
+# =========================
+RUN php artisan storage:link
+
+# =========================
+# MIGRACIONES
+# =========================
 RUN php artisan migrate --force
 
-# Optimización Laravel
+# =========================
+# OPTIMIZAR LARAVEL
+# =========================
 RUN php artisan optimize
 
-# Puerto Render
+# =========================
+# PUERTO RENDER
+# =========================
 EXPOSE 10000
 
-# Ejecutar Laravel
+# =========================
+# EJECUTAR LARAVEL
+# =========================
 CMD php artisan serve --host=0.0.0.0 --port=10000
