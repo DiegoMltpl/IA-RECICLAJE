@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     libzip-dev \
+    libpq-dev \
     sqlite3 \
     libsqlite3-dev \
     zip
