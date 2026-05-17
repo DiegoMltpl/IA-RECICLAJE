@@ -1,6 +1,8 @@
 FROM php:8.3-apache
 
-# Dependencias
+# =========================
+# DEPENDENCIAS
+# =========================
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -9,25 +11,36 @@ RUN apt-get update && apt-get install -y \
     npm \
     libzip-dev \
     libpq-dev \
-    sqlite3 \
-    libsqlite3-dev \
     zip
 
-# PHP Extensions
+# =========================
+# EXTENSIONES PHP
+# =========================
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
-# Composer
+
+# =========================
+# COMPOSER
+# =========================
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Apache rewrite
+# =========================
+# APACHE
+# =========================
 RUN a2enmod rewrite
 
-# Carpeta app
+# =========================
+# WORKDIR
+# =========================
 WORKDIR /var/www/html
 
-# Copiar proyecto
+# =========================
+# COPIAR PROYECTO
+# =========================
 COPY . .
 
-# Config Apache
+# =========================
+# CONFIG APACHE
+# =========================
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
@@ -36,27 +49,50 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
 /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Laravel
+# =========================
+# INSTALAR LARAVEL
+# =========================
 RUN composer install --no-dev --optimize-autoloader
 
-# Frontend
+# =========================
+# FRONTEND / VITE
+# =========================
 RUN npm install
+
+ENV NODE_ENV=production
+
 RUN npm run build
 
+# =========================
+# PERMISOS
+# =========================
+RUN chmod -R 777 storage bootstrap/cache
 
-
-# Permisos
-RUN chmod -R 777 storage bootstrap/cache database
-
-# Variables
+# =========================
+# VARIABLES PRODUCCIÓN
+# =========================
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Laravel
+# =========================
+# LIMPIAR CACHE
+# =========================
 RUN php artisan config:clear
+RUN php artisan cache:clear
 RUN php artisan view:clear
+RUN php artisan route:clear
+
+# =========================
+# STORAGE LINK
+# =========================
 RUN php artisan storage:link
+
+# =========================
+# MIGRACIONES AUTOMÁTICAS
+# =========================
 RUN php artisan migrate --force
 
-# Puerto
+# =========================
+# PUERTO
+# =========================
 EXPOSE 80
