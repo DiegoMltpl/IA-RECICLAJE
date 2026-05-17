@@ -78,9 +78,8 @@ ENV APP_DEBUG=false
 # LIMPIAR CACHE
 # =========================
 RUN php artisan config:clear
-RUN php artisan cache:clear
 RUN php artisan view:clear
-RUN php artisan route:clear
+
 
 # =========================
 # STORAGE LINK
