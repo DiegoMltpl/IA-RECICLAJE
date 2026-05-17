@@ -80,18 +80,17 @@ ENV APP_DEBUG=false
 RUN php artisan config:clear
 RUN php artisan view:clear
 
-
 # =========================
 # STORAGE LINK
 # =========================
 RUN php artisan storage:link
 
 # =========================
-# MIGRACIONES AUTOMÁTICAS
-# =========================
-RUN php artisan migrate --force
-
-# =========================
 # PUERTO
 # =========================
 EXPOSE 80
+
+# =========================
+# INICIAR APP + MIGRACIONES
+# =========================
+CMD php artisan migrate --force && apache2-foreground
