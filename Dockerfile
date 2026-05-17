@@ -13,8 +13,7 @@ RUN apt-get update && apt-get install -y \
     zip
 
 # PHP Extensions
-RUN docker-php-ext-install pdo pdo_mysql pdo_sqlite zip
-
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql zip
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -43,9 +42,7 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
-# SQLite
-RUN mkdir -p database
-RUN touch database/database.sqlite
+
 
 # Permisos
 RUN chmod -R 777 storage bootstrap/cache database
