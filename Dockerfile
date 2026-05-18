@@ -93,4 +93,4 @@ EXPOSE 80
 # =========================
 # INICIAR APP + MIGRACIONES
 # =========================
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
