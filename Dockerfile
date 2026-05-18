@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     npm \
     libzip-dev \
     libpq-dev \
-    zip
+    zip \
+    python3 \
+python3-pip 
 
 # =========================
 # EXTENSIONES PHP
@@ -63,6 +65,8 @@ ENV NODE_ENV=production
 
 RUN npm run build
 
+RUN pip3 install pandas scikit-learn numpy
+
 # =========================
 # PERMISOS
 # =========================
@@ -93,4 +97,4 @@ EXPOSE 80
 # =========================
 # INICIAR APP + MIGRACIONES
 # =========================
-CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
+CMD php artisan migrate --force  && apache2-foreground

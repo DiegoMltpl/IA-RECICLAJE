@@ -34,7 +34,7 @@ class PrediccionController extends Controller
         $output = [];
         $return = 0;
 
-        exec("C:\\laragon\\bin\\python\\python-3.13\\python.exe " . base_path("modelo.py"), $output, $return);
+exec("python3 " . base_path("modelo.py"), $output, $return);
 
         // 🔮 Valores por defecto
         $pred = 0;
