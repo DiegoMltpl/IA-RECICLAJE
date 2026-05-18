@@ -4,30 +4,32 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Pesaje;
-use App\Models\User;
 
 class PesajeSeeder extends Seeder
 {
-   public function run()
-{
-    $user = User::first();
+    public function run(): void
+    {
+        $materiales = [
+            'plastico',
+            'papel',
+            'carton',
+            'vidrio',
+            'metal'
+        ];
 
-    if (!$user) {
-        $user = User::factory()->create([
-            'email' => 'test@test.com',
-            'password' => bcrypt('12345678'),
-        ]);
+        for ($i = 0; $i < 200; $i++) {
+
+            $fecha = now()->subDays(rand(0, 30));
+
+            Pesaje::create([
+                'user_id' => 1,
+                'material' => $materiales[array_rand($materiales)],
+                'peso' => rand(1, 50),
+                'fecha' => $fecha,
+                'created_at' => $fecha,
+                'updated_at' => now(),
+            ]);
+
+        }
     }
-
-    $materiales = ['plastico', 'vidrio', 'metal', 'carton'];
-
-    for ($i = 0; $i < 200; $i++) {
-        Pesaje::create([
-            'user_id' => $user->id,
-            'material' => $materiales[array_rand($materiales)],
-            'peso' => rand(1, 20),
-            'fecha' => now()->subDays(rand(0, 30)),
-        ]);
-    }
-}
 }
