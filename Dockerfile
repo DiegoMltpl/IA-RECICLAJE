@@ -13,7 +13,11 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     zip \
     python3 \
-python3-pip 
+    python3-pip \
+    python3-dev \
+    build-essential \
+    gcc \
+    g++
 
 # =========================
 # EXTENSIONES PHP
@@ -65,7 +69,10 @@ ENV NODE_ENV=production
 
 RUN npm run build
 
-RUN pip3 install pandas scikit-learn numpy
+# =========================
+# PYTHON IA
+# =========================
+RUN pip3 install --break-system-packages pandas scikit-learn numpy
 
 # =========================
 # PERMISOS
@@ -97,4 +104,4 @@ EXPOSE 80
 # =========================
 # INICIAR APP + MIGRACIONES
 # =========================
-CMD php artisan migrate --force  && apache2-foreground
+CMD php artisan migrate --force && apache2-foreground
